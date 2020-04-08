@@ -1,0 +1,22 @@
+{
+  "name": "toolkit",
+  "version": "0.1.0",
+  "description": "A toolkit containing common functionality used across Atellio products",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Easle/toolkit.git"
+  },
+  "author": "Atellio Ltd <vincent@atellio.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Easle/toolkit/issues"
+  },
+  "homepage": "https://github.com/Easle/toolkit#readme",
+  "dependencies": {
+    "winston": "^3.2.1"
+  }
+}
