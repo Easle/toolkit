@@ -1,4 +1,5 @@
-const { createLogger, format, transports } = require("winston");
+const { createLogger, transports } = require("winston");
+const { format } = require("logform/dist/browser");
 
 // Environment variables used to configure the logger
 const EnvOptions = {
