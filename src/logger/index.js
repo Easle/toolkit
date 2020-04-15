@@ -1,3 +1,4 @@
+const Sentry = require("@sentry/node");
 const { createLogger, transports } = require("winston");
 const { format } = require("logform/dist/browser");
 
@@ -116,6 +117,33 @@ class Logger {
     debug(message, ...optionalParams) {
         new Context(this).debug(message, ...optionalParams);
     }
+
+    /**
+     * Enable sending errors to sentry
+     * @param {string} dsn
+     * @returns {Logger}
+     */
+    enableSentry(dsn) {
+        if(dsn) {
+            Sentry.init({
+                dsn: dsn
+            });
+            Sentry.configureScope((scope) => {
+                scope.setTag("environment", EnvOptions.ENVIRONMENT || "unknown");
+            });
+        }
+        return this;
+    }
+
+    /**
+     * Configure Sentry to set context information onto the scope
+     * @param {function} callback
+     * @returns {Logger}
+     */
+    configureSentry(callback) {
+        Sentry.configureScope(callback);
+        return this;
+    }
 }
 
 class Context {
@@ -174,6 +202,7 @@ class Context {
      * @returns {Context}
      */
     withError(err) {
+        Sentry.captureException(err);
         return this.field("error", err.toString());
     }
 
@@ -225,7 +254,7 @@ class Context {
             entry[field.name] = value;
         });
 
-        this._logger.out.log(entry)
+        this._logger.out.log(entry);
     }
 }
 

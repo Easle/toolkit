@@ -1,6 +1,6 @@
 {
   "name": "toolkit",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "description": "A toolkit containing common functionality used across Atellio products",
   "main": "index.js",
   "scripts": {
@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/Easle/toolkit#readme",
   "dependencies": {
+    "@sentry/node": "^5.15.4",
     "logform": "^2.1.2",
     "winston": "^3.2.1"
   }
