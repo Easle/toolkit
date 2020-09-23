@@ -29,6 +29,12 @@ class Logger {
          */
         this.printSenstive = EnvOptions.ENVIRONMENT === "development";
 
+        /**
+         * Global fields are appended to each and every log line.
+         * @type {Array.<Field>}
+         */
+        this.globalFields = [];
+
         const defaultLevel = EnvOptions.LOG_LEVEL ? EnvOptions.LOG_LEVEL : "error";
 
         // Configure formatters
@@ -63,13 +69,48 @@ class Logger {
     }
 
     /**
+     * Set a global field to be append to each log line.
+     * @param {string} name
+     * @param {*} value
+     */
+    setGlobalField(name, value) {
+        this.globalFields.push(new Field(name, value, false));
+        return this;
+    }
+
+    /**
+     * Deprecated, use withField instead.
+     * @param {string} name
+     * @param {*} value
+     * @returns {Context}
+     * @alias
+     * @alias
+     * @deprecated
+     */
+    field(name, value) {
+        return this.withField(name, value);
+    }
+
+    /**
      * Append a field to the log
      * @param {string} name
      * @param {*} value
      * @returns {Context}
      */
-    field(name, value) {
-        return new Context(this).field(name, value);
+    withField(name, value) {
+        return new Context(this).withField(name, value);
+    }
+
+    /**
+     * Deprecated, use withSensitiveField instead.
+     * @param {string} name
+     * @param {*} value
+     * @returns {Context}
+     * @alias
+     * @deprecated
+     */
+    sensitiveField(name, value) {
+        return this.withSensitiveField(name, value);
     }
 
     /**
@@ -78,8 +119,8 @@ class Logger {
      * @param {*} value
      * @returns {Context}
      */
-    sensitiveField(name, value) {
-        return new Context(this).sensitiveField(name, value);
+    withSensitiveField(name, value) {
+        return new Context(this).withSensitiveField(name, value);
     }
 
     /**
@@ -178,10 +219,22 @@ class Context {
      * @param {*} value
      * @returns {Context}
      */
-    field(name, value) {
+    withField(name, value) {
         const field = new Field(name, value, false);
         this._fields.push(field);
         return this;
+    }
+
+    /**
+     * Deprecated, use withField instead.
+     * @param {string} name
+     * @param {*} value
+     * @returns {Context}
+     * @alias
+     * @deprecated
+     */
+    field(name, value) {
+        return this.withField(name, value);
     }
 
     /**
@@ -190,10 +243,22 @@ class Context {
      * @param {*} value
      * @returns {Context}
      */
-    sensitiveField(name, value) {
+    withSensitiveField(name, value) {
         const field = new Field(name, value, true);
         this._fields.push(field);
         return this;
+    }
+
+    /**
+     * Deprecated, use withSensitiveField instead.
+     * @param {string} name
+     * @param {*} value
+     * @returns {Context}
+     * @alias
+     * @deprecated
+     */
+    sensitiveField(name, value) {
+        return this.withSensitiveField(name, value);
     }
 
     /**
@@ -203,7 +268,7 @@ class Context {
      */
     withError(err) {
         Sentry.captureException(err);
-        return this.field("error", err.toString());
+        return this.withField("error", err.toString());
     }
 
     /**
@@ -246,8 +311,9 @@ class Context {
             message: message,
         };
 
-        this._fields.forEach((field) => {
-            let value = field.value;
+        const fields = [...this._logger.globalFields, ...this._fields];
+        fields.forEach((field) => {
+            let value = typeof field.value === "function" ? field.value() : field.value;
             if (field.sensitive && !this._logger.printSenstive) {
                 value = "";
             }
