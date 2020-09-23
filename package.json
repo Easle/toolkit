@@ -1,6 +1,6 @@
 {
   "name": "toolkit",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "A toolkit containing common functionality used across Atellio products",
   "main": "index.js",
   "scripts": {
